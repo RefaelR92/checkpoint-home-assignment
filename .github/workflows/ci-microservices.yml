@@ -1,0 +1,97 @@
+name: CI – Build & Push Microservices
+
+on:
+  pull_request:
+    paths:
+      - "services/service-1-api/**"
+      - "services/service-2-worker/**"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "services/service-1-api/**"
+      - "services/service-2-worker/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-2
+      ACCOUNT_ID: 114118973103
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(cat services/service-1-api/version.txt)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Detect changed services
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            service1:
+              - services/service-1-api/**
+            service2:
+              - services/service-2-worker/**
+
+      # ---- AUTH ONLY FOR NON-PR ----
+      - name: Configure AWS credentials (OIDC)
+        if: github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::114118973103:role/github-actions-ecs-deployer
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: github.event_name != 'pull_request'
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ---- SERVICE 1 ----
+      - name: Build service-1-api
+        if: steps.changes.outputs.service1 == 'true'
+        run: |
+          docker build \
+            -t service-1-api:${{ steps.version.outputs.version }} \
+            services/service-1-api
+
+      - name: Push service-1-api
+        if: github.event_name != 'pull_request' && steps.changes.outputs.service1 == 'true'
+        run: |
+
+          IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/home-assign/service-1-api
+
+          docker tag service-1-api:${{ steps.version.outputs.version }} $IMAGE_URI:${{ steps.version.outputs.version }}
+          docker tag service-1-api:${{ steps.version.outputs.version }} $IMAGE_URI:latest
+
+          docker push $IMAGE_URI:${{ steps.version.outputs.version }}
+          docker push $IMAGE_URI:latest
+
+      # # ---- SERVICE 2 ----
+      # - name: Build service-2-worker
+      #   if: steps.changes.outputs.service2 == 'true'
+      #   run: |
+      #     docker build \
+      #       -t service-2-worker:${{ steps.version.outputs.version }} \
+      #       services/service-2-worker
+      #
+      # - name: Push service-2-worker
+      #   if: github.event_name != 'pull_request' && steps.changes.outputs.service2 == 'true'
+      #   run: |
+      #     IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/home-assign/service-2-worker
+      #
+      #     docker tag service-2-worker:${{ steps.version.outputs.version }} $IMAGE_URI:${{ steps.version.outputs.version }}
+      #     docker tag service-2-worker:${{ steps.version.outputs.version }} $IMAGE_URI:latest
+      #
+      #     docker push $IMAGE_URI:${{ steps.version.outputs.version }}
+      #     docker push $IMAGE_URI:latest

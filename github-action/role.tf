@@ -22,3 +22,34 @@ resource "aws_iam_role" "github_actions" {
   })
 }
 
+resource "aws_iam_role_policy" "github_actions_ecr" {
+  role = aws_iam_role.github_actions.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CompleteLayerUpload",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ]
+        Resource = [
+          "arn:aws:ecr:us-east-2:114118973103:repository/home-assign/service-1-api",
+          "arn:aws:ecr:us-east-2:114118973103:repository/home-assign/service-2-worker"
+        ]
+      }
+    ]
+  })
+}
+
