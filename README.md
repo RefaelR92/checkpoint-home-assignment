@@ -9,8 +9,13 @@
   service owner need to handle the version.txt file manually for each microservice.(will improve to auto bump version with auto merge to main)
 
 - The task requires to create ELB therefore i created ECS with EC2 instances that
-  managed by ASG with launch template and instance profile.
+  managed by ASG with launch template and instance profile and due to CLB/ELB
+  static port only 1 task per each node - for real production we will use ALB that
+  allow dynamic port allocation.
 
 - For simplicity im using latest as image tag, and force deployment in my cd
   after new image is pushed via the ci, in real production will use some tools
   like argoCD that will handle the deployment based on git repo changes.
+
+- For simplicity service-2 (the worker) will execute long pulling from the sqs,
+  as ECS service and not task.

@@ -60,3 +60,24 @@ resource "aws_iam_role" "ecs_task_api" {
   })
 }
 
+
+resource "aws_iam_role_policy" "ecs_task_api_policy" {
+  role = aws_iam_role.ecs_task_api.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:GetParameter"]
+        Resource = "arn:aws:ssm:us-east-2:114118973103:parameter/home-assign/api/token"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["sqs:SendMessage"]
+        Resource = data.terraform_remote_state.sqs.outputs.queue_arn
+      }
+    ]
+  })
+}
+
