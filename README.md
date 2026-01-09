@@ -23,6 +23,7 @@ This project demonstrates a simple microservices architecture deployed on AWS us
   - The home assignment explicitly required using a **Classic Load Balancer (ELB)**.
   - Since Classic ELB does not support dynamic port mapping or `awsvpc` networking, ECS is deployed using the **EC2 launch type**.
   - EC2 instances are managed via an **Auto Scaling Group** with a launch template and instance profile.
+  - In a production environment without this constraint, an **Application Load Balancer (ALB)** with dynamic port mapping or Fargate would be preferred.
 
 - **Image Versioning & Deployment**
   - For simplicity, the `latest` image tag is used.
