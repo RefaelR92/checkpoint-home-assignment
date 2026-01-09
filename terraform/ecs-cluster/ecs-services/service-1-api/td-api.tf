@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "api" {
   container_definitions = jsonencode([
     {
       name              = "api"
-      image             = "nginx:latest" # placeholder until app is ready
+      image             = "${aws_ecr_repository.api_repo.repository_url}:latest"
       essential         = true
       memoryReservation = 256
 

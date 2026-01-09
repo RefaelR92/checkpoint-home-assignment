@@ -10,3 +10,7 @@
 
 - The task requires to create ELB therefore i created ECS with EC2 instances that
   managed by ASG with launch template and instance profile.
+
+- For simplicity im using latest as image tag, and force deployment in my cd
+  after new image is pushed via the ci, in real production will use some tools
+  like argoCD that will handle the deployment based on git repo changes.
