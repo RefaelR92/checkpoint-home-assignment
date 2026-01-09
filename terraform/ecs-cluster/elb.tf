@@ -15,7 +15,7 @@ resource "aws_elb" "api" {
   }
 
   health_check {
-    target              = "HTTP:80/"
+    target              = "HTTP:80/health"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
