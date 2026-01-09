@@ -1,0 +1,39 @@
+name: CD – Deploy to ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "Which service to deploy"
+        required: true
+        type: choice
+        options:
+          - api
+          - worker
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-2
+  ACCOUNT_ID: 114118973103
+  ECS_CLUSTER: home-assign-ecs
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::114118973103:role/github-actions-ecs-deployer
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service ${{ inputs.service }} \
+            --force-new-deployment

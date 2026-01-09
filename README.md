@@ -18,4 +18,8 @@
   like argoCD that will handle the deployment based on git repo changes.
 
 - For simplicity service-2 (the worker) will execute long pulling from the sqs,
-  as ECS service and not task.
+  as ECS service and not task
+
+In order to use the system:
+elb ens: <http://home-assign-api-elb-1708341051.us-east-2.elb.amazonaws.com/publish>
+the token will be send in the email..
