@@ -21,3 +21,23 @@ resource "aws_iam_instance_profile" "ecs" {
   role = aws_iam_role.ecs_instance_role.name
 }
 
+resource "aws_iam_role_policy" "ecs_instance_logs" {
+  name = "ecs-instance-cloudwatch-logs"
+  role = aws_iam_role.ecs_instance_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
