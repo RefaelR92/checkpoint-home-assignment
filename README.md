@@ -1,25 +1,43 @@
 # checkpoint-home-assignment
 
-- Im using terraform vpc module and use single NAT gateway for 2 subnets just
-  because cost optimization. In production environment its better to have one NAT gateway for each subnet for HA.
+This project demonstrates a simple microservices architecture deployed on AWS using Terraform, ECS (EC2 launch type), and GitHub Actions for CI/CD.
 
-- i've connected my aws account to github actions by set oidc identity provider and created role with proper trust relationship (IaC with terraform)
+## Architecture & Design Decisions
 
-- My ci will build for pr and build and push for merged to main branch, the
-  service owner need to handle the version.txt file manually for each microservice.(will improve to auto bump version with auto merge to main)
+- **VPC & Networking**
+  - I’m using the official Terraform VPC module.
+  - For cost optimization, the setup uses a **single NAT Gateway** shared by two private subnets.
+  - In a real production environment, it’s recommended to use **one NAT Gateway per AZ** to ensure high availability.
 
-- The task requires to create ELB therefore i created ECS with EC2 instances that
-  managed by ASG with launch template and instance profile and due to CLB/ELB
-  static port only 1 task per each node - for real production we will use ALB that
-  allow dynamic port allocation.
+- **Authentication & CI/CD Access**
+  - GitHub Actions is connected to the AWS account using **OIDC**.
+  - An IAM role with a proper trust relationship is created via Terraform and assumed by GitHub Actions (no static AWS credentials).
 
-- For simplicity im using latest as image tag, and force deployment in my cd
-  after new image is pushed via the ci, in real production will use some tools
-  like argoCD that will handle the deployment based on git repo changes.
+- **CI Pipeline**
+  - CI builds Docker images on pull requests.
+  - On merge to `main`, images are built and pushed to ECR.
+  - Each microservice has a `version.txt` file that must currently be updated manually.
+  - This can be improved by adding **automatic version bumping and auto-merge** in the future.
 
-- For simplicity service-2 (the worker) will execute long pulling from the sqs,
-  as ECS service and not task
+- **ECS & Load Balancing**
+  - The API service requires a classic ELB, so ECS is deployed using the **EC2 launch type**.
+  - EC2 instances are managed via an **Auto Scaling Group** with a launch template and instance profile.
+  - Due to ELB static port mapping, **only one task per EC2 instance** is allowed.
+  - In a production setup, an **Application Load Balancer (ALB)** would be used to enable **dynamic port mapping** and better scaling.
 
-In order to use the system:
-elb ens: <http://home-assign-api-elb-1708341051.us-east-2.elb.amazonaws.com/publish>
-the token will be send in the email..
+- **Image Versioning & Deployment**
+  - For simplicity, the `latest` image tag is used.
+  - The CD pipeline forces a new deployment after each image push.
+  - In production, a GitOps approach (e.g., **Argo CD**) would be preferable, deploying based on Git state rather than forcing updates.
+
+- **Worker Service (Service 2)**
+  - The worker service continuously long-polls messages from SQS.
+  - It is implemented as an ECS **service**, not a scheduled task, for simplicity.
+  - In a production system, this could also be implemented using:
+    - Scheduled ECS tasks
+    - Event-driven architectures
+    - Or autoscaling based on SQS depth
+
+## Usage
+
+- API endpoint (via ELB) and token will be send over email.
