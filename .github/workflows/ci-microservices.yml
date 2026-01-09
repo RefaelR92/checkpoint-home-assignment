@@ -32,7 +32,7 @@ jobs:
       - name: Read version
         id: version
         run: |
-          VERSION=$(cat version.txt)
+          VERSION=$(cat services/service-1-api/version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Detect changed services
