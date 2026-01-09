@@ -1,0 +1,79 @@
+name: CI – Build & Push Microservices
+
+on:
+  # will check just build without push from pull requests
+  pull_request:
+    paths:
+      - "services/service-1-api/**"
+      - "services/service-2-worker/**"
+
+  # will manage build and push
+  push:
+    branches:
+      - main
+    paths:
+      - "services/service-1-api/**"
+      - "services/service-2-worker/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-2
+      ACCOUNT_ID: 114118973103
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::114118973103:role/github-actions-ecs-deployer
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Detect changed services
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            service1:
+              - services/service-1-api/**
+            service2:
+              - services/service-2-worker/**
+
+      - name: Build & push service-1-api
+        if: steps.changes.outputs.service1 == 'true'
+        run: |
+          docker build \
+            -t home-assign/service-1-api:${{ github.sha }} \
+            services/service-1-api
+
+          docker tag \
+            home-assign/service-1-api:${{ github.sha }} \
+            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/home-assign/service-1-api:${{ github.sha }}
+
+          docker push \
+            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/home-assign/service-1-api:${{ github.sha }}
+
+      - name: Build & push service-2-worker
+        if: steps.changes.outputs.service2 == 'true'
+        run: |
+          docker build \
+            -t home-assign/service-2-worker:${{ github.sha }} \
+            services/service-2-worker
+
+          docker tag \
+            home-assign/service-2-worker:${{ github.sha }} \
+            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/home-assign/service-2-worker:${{ github.sha }}
+
+          docker push \
+            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/home-assign/service-2-worker:${{ github.sha }}

@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "api" {
       environment = [
         {
           name  = "SQS_QUEUE_URL"
-          value = "TO_BE_SET"
+          value = data.terraform_remote_state.sqs.outputs.queue_url
         },
         {
           name  = "TOKEN_SSM_PARAM"
