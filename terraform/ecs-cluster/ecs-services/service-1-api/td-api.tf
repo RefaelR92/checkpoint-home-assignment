@@ -4,7 +4,8 @@ resource "aws_ecs_task_definition" "api" {
   requires_compatibilities = ["EC2"]
 
 
-  execution_role_arn = aws_iam_role.ecs_execution.arn
+  # execution_role_arn = aws_iam_role.ecs_execution.arn
+  execution_role_arn = data.terraform_remote_state.ecs.outputs.ecs_execution_role_arn
   task_role_arn      = aws_iam_role.ecs_task_api.arn
 
   container_definitions = jsonencode([
