@@ -13,23 +13,23 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   }
 }
 
-resource "aws_security_group" "ecs_tasks" {
-  name   = "ecs-tasks-sg"
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
-
-  ingress = [] # no inbound yet
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "ecs-tasks"
-  }
-}
+# resource "aws_security_group" "ecs_tasks" {
+#   name   = "ecs-tasks-sg"
+#   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+#
+#   ingress = [] # no inbound yet
+#
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+#
+#   tags = {
+#     Name = "ecs-tasks"
+#   }
+# }
 
 resource "aws_iam_role" "ecs_execution" {
   name = "ecsTaskExecutionRole"
