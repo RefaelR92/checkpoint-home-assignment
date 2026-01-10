@@ -1,3 +1,6 @@
+locals {
+  log_group_name = "/ecs/home-assign-worker"
+}
 resource "aws_ecs_task_definition" "worker" {
   family                   = "home-assign-worker"
   network_mode             = "bridge"
@@ -35,7 +38,7 @@ resource "aws_ecs_task_definition" "worker" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "/ecs/home-assign-worker"
+          awslogs-group         = lpcal.log_group_name
           awslogs-region        = var.region
           awslogs-stream-prefix = "ecs"
         }
@@ -81,5 +84,11 @@ resource "aws_iam_role_policy" "ecs_task_worker_policy" {
       }
     ]
   })
+}
+
+# Create logs group for ECS worker task logs
+resource "aws_cloudwatch_log_group" "worker_logs" {
+  name              = local.log_group_name
+  retention_in_days = 1
 }
 
