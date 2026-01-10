@@ -3,8 +3,11 @@ resource "aws_ecs_task_definition" "worker" {
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
 
+  # Used by the container to access AWS resources
   execution_role_arn = data.terraform_remote_state.ecs.outputs.ecs_execution_role_arn
-  task_role_arn      = aws_iam_role.ecs_task_worker.arn
+
+  # Used by the container to access AWS resources
+  task_role_arn = aws_iam_role.ecs_task_worker.arn
 
   container_definitions = jsonencode([
     {
@@ -21,7 +24,7 @@ resource "aws_ecs_task_definition" "worker" {
         },
         {
           name  = "S3_BUCKET"
-          value = aws_s3_bucket.messages.bucket_domain_name
+          value = aws_s3_bucket.messages.id
         },
         {
           name  = "S3_PREFIX"
@@ -74,7 +77,7 @@ resource "aws_iam_role_policy" "ecs_task_worker_policy" {
         Action = [
           "s3:PutObject"
         ]
-        Resource = "arn:aws:s3:::${aws_s3_bucket.messages.bucket_domain_name}/*"
+        Resource = "${aws_s3_bucket.messages.arn}/*"
       }
     ]
   })
