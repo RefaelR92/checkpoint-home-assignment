@@ -5,7 +5,8 @@ This project demonstrates a simple microservices architecture deployed on AWS us
 ## Architecture & Design Decisions
 
 - Terraform State Management
-  - Terraform remote state is stored in a dedicated S3 bucket. The bucket itself is bootstrapped using local state from the init/ folder,
+  - Terraform remote state is stored in a dedicated S3 bucket.
+  - The state bucket itself is bootstrapped using local state from the `init/` folder,
     after which all infrastructure is managed using S3-backed remote state files.
 
 - **VPC & Networking**
@@ -45,6 +46,20 @@ This project demonstrates a simple microservices architecture deployed on AWS us
 ## Usage
 
 - API endpoint (via ELB) and token will be send over email.
+- Path to publish message to api service: <kbd>/publish</kbd>
+- The API verb is POST with the following JSON body:
+
+```json
+{
+    "data": {
+    "email_subject": "Happy new year!ffff",
+    "email_sender": "John Doe",
+    "email_timestream": "1693561101",
+    "email_content": "Just want to say... Happy new year!!!"
+  },
+  "token":<will be send via email>
+}
+```
 
 ### Load Balancer
 
