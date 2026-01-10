@@ -61,6 +61,12 @@ This project demonstrates a simple microservices architecture deployed on AWS us
 }
 ```
 
+## CI / CD Pipeline
+
+- on pr a build will be triggered to build and test the docker images
+- CI on merge to main branch a build and push to ECR will be triggered.
+- CD will be trigger manually via GitHub Actions to deploy the new images to ECS.
+
 ### Load Balancer
 
 The assignment specifies the use of an **Elastic Load Balancer (ELB)**.
