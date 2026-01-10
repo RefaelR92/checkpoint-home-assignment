@@ -15,7 +15,7 @@ resource "aws_s3_bucket" "tf_state" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "this" {
+resource "aws_s3_bucket_versioning" "s3_bucket_versioning" {
   bucket = aws_s3_bucket.tf_state.id
 
   versioning_configuration {

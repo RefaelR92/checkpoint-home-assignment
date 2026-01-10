@@ -4,9 +4,11 @@ resource "aws_ecs_task_definition" "api" {
   requires_compatibilities = ["EC2"]
 
 
-  # execution_role_arn = aws_iam_role.ecs_execution.arn
+  # Used by ECS (control plane) to pull container images and publish logs
   execution_role_arn = data.terraform_remote_state.ecs.outputs.ecs_execution_role_arn
-  task_role_arn      = aws_iam_role.ecs_task_api.arn
+
+  # Used by the container to access AWS resources
+  task_role_arn = aws_iam_role.ecs_task_api.arn
 
   container_definitions = jsonencode([
     {
@@ -31,7 +33,7 @@ resource "aws_ecs_task_definition" "api" {
         },
         {
           name  = "TOKEN_SSM_PARAM"
-          value = "/home-assign/api/token"
+          value = aws_ssm_parameter.api_token.name
         }
       ]
 

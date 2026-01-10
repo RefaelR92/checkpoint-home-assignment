@@ -53,3 +53,26 @@ resource "aws_iam_role_policy" "github_actions_ecr" {
   })
 }
 
+
+resource "aws_iam_role_policy" "github_actions_ecs_deploy" {
+  role = aws_iam_role.github_actions.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:UpdateService",
+          "ecs:DescribeServices",
+          "ecs:DescribeTaskDefinition"
+        ]
+        Resource = [
+          "arn:aws:ecs:us-east-2:114118973103:service/home-assign-ecs/api",
+          "arn:aws:ecs:us-east-2:114118973103:service/home-assign-ecs/worker"
+        ]
+      }
+    ]
+  })
+}
+
