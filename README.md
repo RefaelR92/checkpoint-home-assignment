@@ -62,4 +62,4 @@ and keeps the implementation aligned with the stated requirements.
 
 ### Application / Service Flow
 
-![Service Flow Diagram](docs/diagrams/applicaiton-diagram.png)
+![Service Flow Diagram](docs/diagrams/application-diagram.png)
