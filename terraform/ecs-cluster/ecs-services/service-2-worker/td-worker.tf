@@ -3,7 +3,7 @@ resource "aws_ecs_task_definition" "worker" {
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
 
-  # Used by the container to access AWS resources
+  # Used by ECS (control plane) to pull container images and publish logs
   execution_role_arn = data.terraform_remote_state.ecs.outputs.ecs_execution_role_arn
 
   # Used by the container to access AWS resources
