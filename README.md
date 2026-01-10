@@ -59,3 +59,7 @@ In a production-grade system, an **Application Load Balancer (ALB)** would
 typically be preferred to support dynamic port mapping, higher task density,
 and more flexible routing. The current setup follows the assignment wording
 and keeps the implementation aligned with the stated requirements.
+
+### Application / Service Flow
+
+![Service Flow Diagram](docs/diagrams/service.drawio.png)
