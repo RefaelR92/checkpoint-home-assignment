@@ -38,7 +38,7 @@ resource "aws_ecs_task_definition" "worker" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = lpcal.log_group_name
+          awslogs-group         = local.log_group_name
           awslogs-region        = var.region
           awslogs-stream-prefix = "ecs"
         }
