@@ -4,6 +4,10 @@ This project demonstrates a simple microservices architecture deployed on AWS us
 
 ## Architecture & Design Decisions
 
+- Terraform State Management
+  - Terraform remote state is stored in a dedicated S3 bucket. The bucket itself is bootstrapped using local state from the init/ folder,
+    after which all infrastructure is managed using S3-backed remote state files.
+
 - **VPC & Networking**
   - I’m using the official Terraform VPC module.
   - For cost optimization, the setup uses a **single NAT Gateway** shared by two private subnets.
@@ -41,3 +45,17 @@ This project demonstrates a simple microservices architecture deployed on AWS us
 ## Usage
 
 - API endpoint (via ELB) and token will be send over email.
+
+### Load Balancer
+
+The assignment specifies the use of an **Elastic Load Balancer (ELB)**.
+Based on this requirement, the implementation uses a **Classic Load Balancer**
+integrated with ECS on the EC2 launch type.
+
+This approach requires static port mapping and results in one running task per
+EC2 instance, which is handled via Auto Scaling.
+
+In a production-grade system, an **Application Load Balancer (ALB)** would
+typically be preferred to support dynamic port mapping, higher task density,
+and more flexible routing. The current setup follows the assignment wording
+and keeps the implementation aligned with the stated requirements.
