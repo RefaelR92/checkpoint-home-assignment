@@ -9,7 +9,8 @@ class EmailData(BaseModel):
     email_content: str
 
     @field_validator("email_timestream")
-    def validate_timestamp(self, v):
+    @classmethod  # This is the missing piece that fixes your error
+    def validate_timestamp(cls, v: str):
         try:
             # Check if it can be converted to an int and then a valid date
             datetime.fromtimestamp(int(v))
