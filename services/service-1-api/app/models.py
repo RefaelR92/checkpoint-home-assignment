@@ -1,18 +1,25 @@
-from typing import Any, Dict
+from datetime import datetime
+from pydantic import BaseModel, Field, field_validator
 
-from pydantic import BaseModel, Field
 
-
-class Payload(BaseModel):
+class EmailData(BaseModel):
     email_subject: str
     email_sender: str
-    email_timestream: int = Field(..., description="Unix timestream")
+    email_timestream: str = Field(..., description="Unix timestamp string")
     email_content: str
+
+    @field_validator("email_timestream")
+    def validate_timestamp(self, v):
+        try:
+            # Check if it can be converted to an int and then a valid date
+            datetime.fromtimestamp(int(v))
+            return v
+        except (ValueError, TypeError):
+            raise ValueError(
+                "Invalid timestamp format; must be a valid Unix timestream."
+            )
 
 
 class RequestBody(BaseModel):
-    data: Payload
+    data: EmailData
     token: str
-
-
-test = RequestBody()
