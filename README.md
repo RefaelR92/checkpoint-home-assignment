@@ -60,6 +60,10 @@ typically be preferred to support dynamic port mapping, higher task density,
 and more flexible routing. The current setup follows the assignment wording
 and keeps the implementation aligned with the stated requirements.
 
+### Network & Compute Architecture
+
+![Network Architecture](docs/diagrams/network-and-compute-topology-diagram.png)
+
 ### Application / Service Flow
 
 ![Service Flow Diagram](docs/diagrams/application-diagram.png)
