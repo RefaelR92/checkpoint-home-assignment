@@ -1,3 +1,6 @@
+locals {
+  log_group_name = "/ecs/home-assign-api"
+}
 resource "aws_ecs_task_definition" "api" {
   family                   = "home-assign-api"
   network_mode             = "bridge"
@@ -40,7 +43,7 @@ resource "aws_ecs_task_definition" "api" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "/ecs/home-assign-api"
+          awslogs-group         = local.log_group_name
           awslogs-region        = var.region
           awslogs-stream-prefix = "ecs"
         }
@@ -83,3 +86,8 @@ resource "aws_iam_role_policy" "ecs_task_api_policy" {
   })
 }
 
+# Create logs group for ECS API task logs
+resource "aws_cloudwatch_log_group" "api_logs" {
+  name              = local.log_group_name
+  retention_in_days = 1
+}

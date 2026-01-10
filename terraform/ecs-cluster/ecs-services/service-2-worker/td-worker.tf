@@ -1,10 +1,16 @@
+locals {
+  log_group_name = "/ecs/home-assign-worker"
+}
 resource "aws_ecs_task_definition" "worker" {
   family                   = "home-assign-worker"
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
 
+  # Used by ECS (control plane) to pull container images and publish logs
   execution_role_arn = data.terraform_remote_state.ecs.outputs.ecs_execution_role_arn
-  task_role_arn      = aws_iam_role.ecs_task_worker.arn
+
+  # Used by the container to access AWS resources
+  task_role_arn = aws_iam_role.ecs_task_worker.arn
 
   container_definitions = jsonencode([
     {
@@ -21,7 +27,7 @@ resource "aws_ecs_task_definition" "worker" {
         },
         {
           name  = "S3_BUCKET"
-          value = aws_s3_bucket.messages.bucket_domain_name
+          value = aws_s3_bucket.messages.id
         },
         {
           name  = "S3_PREFIX"
@@ -32,7 +38,7 @@ resource "aws_ecs_task_definition" "worker" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "/ecs/home-assign-worker"
+          awslogs-group         = local.log_group_name
           awslogs-region        = var.region
           awslogs-stream-prefix = "ecs"
         }
@@ -74,9 +80,15 @@ resource "aws_iam_role_policy" "ecs_task_worker_policy" {
         Action = [
           "s3:PutObject"
         ]
-        Resource = "arn:aws:s3:::${aws_s3_bucket.messages.bucket_domain_name}/*"
+        Resource = "${aws_s3_bucket.messages.arn}/*"
       }
     ]
   })
+}
+
+# Create logs group for ECS worker task logs
+resource "aws_cloudwatch_log_group" "worker_logs" {
+  name              = local.log_group_name
+  retention_in_days = 1
 }
 

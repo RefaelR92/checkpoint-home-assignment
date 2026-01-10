@@ -49,6 +49,20 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role_policy" "ecs_execution_logs_extra" {
+  role = aws_iam_role.ecs_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["logs:CreateLogGroup"]
+      Resource = "*"
+    }]
+  })
+}
+
+
 resource "aws_security_group" "ecs_instances" {
   name   = "ecs-instances-sg"
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
