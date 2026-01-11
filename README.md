@@ -8,6 +8,9 @@ This project demonstrates a simple microservices architecture deployed on AWS us
   - Terraform remote state is stored in a dedicated S3 bucket.
   - The state bucket itself is bootstrapped using local state from the `init/` folder,
     after which all infrastructure is managed using S3-backed remote state files.
+    -The terraform aws provider and the remote state based on the profile called `[SRE]` (i didn't think
+    that should run on your end, my first home assignment [changed after
+    submission])
 
 - **VPC & Networking**
   - I’m using the official Terraform VPC module.
@@ -27,7 +30,7 @@ This project demonstrates a simple microservices architecture deployed on AWS us
 - **ECS & Load Balancing**
   - The home assignment explicitly required using a **Classic Load Balancer (ELB)**.
   - Since Classic ELB does not support dynamic port mapping or `awsvpc` networking, ECS is deployed using the **EC2 launch type**.
-  - EC2 instances are managed via an Auto Scaling Group using a launch template and instance profile, and are based on the Amazon ECS-optimized AMI to ensure proper ECS agent configuration and compatibility.
+  - EC2 instances are managed via an **Auto Scaling Group** with a launch template and instance profile.
   - In a production environment without this constraint, an **Application Load Balancer (ALB)** with dynamic port mapping or Fargate would be preferred.
 
 - **Image Versioning & Deployment**
@@ -52,33 +55,13 @@ This project demonstrates a simple microservices architecture deployed on AWS us
 ```json
 {
     "data": {
-    "email_subject": "Happy new year",
+    "email_subject": "Happy new year!ffff",
     "email_sender": "John Doe",
     "email_timestream": "1693561101",
     "email_content": "Just want to say... Happy new year!!!"
   },
   "token":<will be send via email>
 }
-```
-
-### Testing the API
-
-Once the service is running, you can test it using the following curl command:
-
-```bash
-ELB_URL="<elb_url>/publish"
-
-curl -X POST "$ELB_URL/publish" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "data": {
-      "email_subject": "Happy new year!",
-      "email_sender": "John Doe",
-      "email_timestream": "1693561101",
-      "email_content": "Just want to say... Happy new year!!!"
-    },
-    "token": "YOUR_TOKEN_HERE"
-  }'
 ```
 
 ## CI / CD Pipeline
@@ -108,7 +91,3 @@ and keeps the implementation aligned with the stated requirements.
 ### Application / Service Flow
 
 ![Service Flow Diagram](docs/diagrams/application-diagram.png)
-
-```
-
-```
