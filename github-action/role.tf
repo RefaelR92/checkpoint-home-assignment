@@ -13,7 +13,6 @@ resource "aws_iam_role" "github_actions" {
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
-        # considire use :ref:refs/heads/main (suffix) to restrict to main branch only
         StringLike = {
           "token.actions.githubusercontent.com:sub" = "repo:RefaelR92/checkpoint-home-assignment:*"
         }

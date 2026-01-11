@@ -1,9 +1,9 @@
 from datetime import datetime
-from flask import Flask, jsonify, request
-from pydantic import ValidationError
-from models import RequestBody
 
 from aws import get_expected_token, send_to_sqs
+from flask import Flask, jsonify, request
+from models import RequestBody
+from pydantic import ValidationError
 from settings import SQS_QUEUE_URL
 
 app = Flask(__name__)
@@ -11,10 +11,10 @@ app = Flask(__name__)
 
 @app.route("/publish", methods=["POST"])
 def publish():
-   # Parse and Validate Schema using Pydantic
+    # Parse and Validate Schema using Pydantic
     try:
         raw_json = request.get_json(force=True)
-        # This checks field presence, types, and the custom timestamp logic
+        # This checks field presence, types, and the custom timestream logic
         validated_body = RequestBody(**raw_json)
     except ValidationError as e:
         return jsonify({"error": "Validation failed", "details": e.errors()}), 400

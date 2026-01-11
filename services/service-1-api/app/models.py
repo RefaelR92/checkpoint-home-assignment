@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -9,7 +10,7 @@ class EmailData(BaseModel):
     email_content: str
 
     @field_validator("email_timestream")
-    @classmethod  # This is the missing piece that fixes your error
+    @classmethod
     def validate_timestamp(cls, v: str):
         try:
             # Check if it can be converted to an int and then a valid date
